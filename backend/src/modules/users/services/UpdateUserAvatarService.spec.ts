@@ -9,7 +9,10 @@ describe('UpdateUserAvatar', () => {
     const fakeUsersRepository = new FakeUsersRepository();
     const fakeStorageProvider = new FakeStorageProvider();
 
-    const updateUserAvatar = new UpdateUserAvatarService(fakeUsersRepository, fakeStorageProvider);
+    const updateUserAvatar = new UpdateUserAvatarService(
+      fakeUsersRepository,
+      fakeStorageProvider,
+    );
 
     const user = await fakeUsersRepository.create({
       name: 'John Doe',
@@ -19,25 +22,28 @@ describe('UpdateUserAvatar', () => {
 
     await updateUserAvatar.execute({
       user_id: user.id,
-      avatarFilename: 'avatar.jpg'
+      avatarFilename: 'avatar.jpg',
     });
 
     expect(user.avatar).toEqual('avatar.jpg');
-
-  })
+  });
 
   it('should not be able to update avatar from a non existing user', async () => {
     const fakeUsersRepository = new FakeUsersRepository();
     const fakeStorageProvider = new FakeStorageProvider();
 
-    const updateUserAvatar = new UpdateUserAvatarService(fakeUsersRepository, fakeStorageProvider);
+    const updateUserAvatar = new UpdateUserAvatarService(
+      fakeUsersRepository,
+      fakeStorageProvider,
+    );
 
-    expect(updateUserAvatar.execute({
-      user_id: 'non-existing-user',
-      avatarFilename: 'avatar.jpg'
-    })).rejects.toBeInstanceOf(AppError);
-
-  })
+    await expect(
+      updateUserAvatar.execute({
+        user_id: 'non-existing-user',
+        avatarFilename: 'avatar.jpg',
+      }),
+    ).rejects.toBeInstanceOf(AppError);
+  });
 
   it('should delete old avatar when update a new one', async () => {
     const fakeUsersRepository = new FakeUsersRepository();
@@ -47,7 +53,10 @@ describe('UpdateUserAvatar', () => {
 
     console.log(deleteFile);
 
-    const updateUserAvatar = new UpdateUserAvatarService(fakeUsersRepository, fakeStorageProvider);
+    const updateUserAvatar = new UpdateUserAvatarService(
+      fakeUsersRepository,
+      fakeStorageProvider,
+    );
 
     const user = await fakeUsersRepository.create({
       name: 'John Doe',
@@ -57,16 +66,15 @@ describe('UpdateUserAvatar', () => {
 
     await updateUserAvatar.execute({
       user_id: user.id,
-      avatarFilename: 'avatar.jpg'
+      avatarFilename: 'avatar.jpg',
     });
 
     await updateUserAvatar.execute({
       user_id: user.id,
-      avatarFilename: 'avatar2.jpg'
+      avatarFilename: 'avatar2.jpg',
     });
 
     expect(deleteFile).toHaveBeenCalledWith('avatar.jpg');
     expect(user.avatar).toEqual('avatar2.jpg');
-
-  })
+  });
 });
