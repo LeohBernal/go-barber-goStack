@@ -81,12 +81,12 @@ export const AuthProvider: React.FC = ({ children }) => {
   }, []);
 
   const updateUser = useCallback(
-    (user: User) => {
-      // localStorage.setItem('@GoBarber:user', JSON.stringify(user));
-      // setData({
-      //   token: data.token,
-      //   user,
-      // });
+    async (user: User) => {
+      await AsyncStorage.setItem('@GoBarber:user', JSON.stringify(user));
+      setData({
+        token: data.token,
+        user,
+      });
     },
     [setData, data.token],
   );
